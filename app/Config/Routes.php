@@ -14,3 +14,6 @@ $routes->get('/coba', function() {
 $routes->get('/coba/about/(:any)/(:num)', 'Coba::about/$1/$2');      # :any -> mengambil apapun nilai yang ada di url | $1 -> akan mengambil placeholder di paramater url
 
 $routes->get('/users', 'Admin\Users::index');
+
+$routes->get('/home', 'Pages::index');
+$routes->get('/about', 'Pages::about');
