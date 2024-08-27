@@ -22,7 +22,7 @@
                                 <td><img src="/img/<?= $comic['sampul']; ?>" alt="" class="sampul"></td>
                                 <td><?= $comic['judul']; ?></td>
                                 <td>
-                                    <a href="" class="btn btn-success">Detail</a>
+                                    <a href="/comics/<?= $comic['slug']; ?>" class="btn btn-success">Detail</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

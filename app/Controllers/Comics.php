@@ -15,11 +15,11 @@ class Comics extends BaseController
     
     public function index()
     {
-        $comics = $this->comicModel->findAll();
+        // $comics = $this->comicModel->findAll();
 
         $data = [
             'title' => 'Daftar Komik',
-            'comics' => $comics
+            'comics' => $this->comicModel->getComic()
         ];
 
         // $comicModel = new \App\Models\ComicModel();
@@ -27,6 +27,15 @@ class Comics extends BaseController
         // $comics = $this->comicModel->findAll();
         
         return view('comic/index', $data);
+    }
+
+    public function detail($slug) {
+        $data = [
+            'title' => 'Detail Comic',
+            'comic' => $this->comicModel->getComic($slug)
+        ];
+
+        return view('comic/detail', $data);
     }
     
     
