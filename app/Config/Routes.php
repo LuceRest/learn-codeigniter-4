@@ -5,7 +5,8 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::coba');
+// $routes->get('/', 'Home::index');
+$routes->get('/', 'Pages::index');
 
 $routes->get('/coba', function() {
     echo "Hello World!";
@@ -20,4 +21,6 @@ $routes->get('/about', 'Pages::about');
 $routes->get('/contact', 'Pages::contact');
 
 $routes->get('/comics', 'Comics::index');
+$routes->get('/comics/create', 'Comics::create');
 $routes->get('/comics/(:segment)', 'Comics::detail/$1');
+$routes->post('/comics/save', 'Comics::save');
