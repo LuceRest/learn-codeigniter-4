@@ -29,6 +29,7 @@ class Comics extends BaseController
         return view('comic/index', $data);
     }
 
+    // Method untuk menampilkan detail data
     public function detail($slug) {
         $data = [
             'title' => 'Detail Comic',
@@ -43,6 +44,7 @@ class Comics extends BaseController
         return view('comic/detail', $data);
     }
     
+    // Method untuk menampilkan view untuk menambah data
     public function create() {
         // session();
         $data = [
@@ -60,6 +62,7 @@ class Comics extends BaseController
         return view('comic/create', $data);
     }
 
+    // Method untuk melakukan simpan data
     public function save() {
         // Mengambil request form dengan method get maupun post
         // dd($this->request->getVar());
@@ -102,12 +105,90 @@ class Comics extends BaseController
         // return redirect()->to('/comics');
         return redirect()->to(base_url('comics'));
     }
-    
-    public function change() {
-        dd(\Config\Services::validation());
+
+    // Method untuk melakukan delete data
+    public function delete($id) {
+        // Menghapus data
+        $this->comicModel->delete($id);
+
+        // Menambahkan flash message melalui session
+        session()->setFlashdata('pesan', 'Data Comic successfully delete');
 
         return redirect()->to(base_url('comics'));
     }
+
+    // Method untuk menampilkan view untuk edit data
+    public function edit($slug) {
+        // session();
+        $data = [
+            'title' => 'Form Edit New Comic',
+            // 'validation' => \Config\Services::validation()
+            'validation' => false,
+            'comic' => $this->comicModel->getComic($slug)
+        ];
+        // dd($data);   
+        // dd(\Config\Services::validation());
+
+        if ( session('validation') ) {
+            $data['validation'] = session('validation')->getErrors();
+        }
+
+        return view('comic/edit', $data);
+    }
+
+    // Method untuk melakukan update data
+    public function update($id) {
+        // Cek judul sama dengan yg lama atau tidak
+        $oldComic = $this->comicModel->getComic($this->request->getVar('slug'));
+        if ( $oldComic['judul'] == $this->request->getVar('judul') ) {
+            $rule_judul = 'required';
+        } else {
+            $rule_judul = 'required|is_unique[comic.judul]';
+        }
+
+        // Validasi input
+        if ( !$this->validate([
+            // 'judul' => 'required|is_unique[comic.judul]',
+            'judul' => [
+                'rules' => $rule_judul,
+                'errors' => [
+                    'required' => '{field} komik harus diisi.',
+                    'is_unique' => '{field} komik sudah terdaftar.'
+                ]
+            ],
+            'penulis' => 'required',
+            'penerbit' => 'required',
+            'sampul' => 'required',
+        ]) ) {
+            $validation = \Config\Services::validation();
+            return redirect()->to(base_url('comics/edit/' . $this->request->getVar('slug') ))->withInput()->with('validation', $validation);
+        }
+        
+        $slug = url_title($this->request->getVar('judul'), '-', true);
+        
+        // Melakukan save data
+        $this->comicModel->save([
+            'id' => $id,
+            'judul' => $this->request->getVar('judul'),
+            'slug' => $slug,
+            'penulis' => $this->request->getVar('penulis'),
+            'penerbit' => $this->request->getVar('penerbit'),
+            'sampul' => $this->request->getVar('sampul'),
+        ]);
+
+        // Menambahkan flash message melalui session
+        session()->setFlashdata('pesan', 'Data Comic successfully edited');
+        
+        // Melakukan redirect url
+        return redirect()->to(base_url('comics'));
+    }
+    
+    
+    // public function change() {
+    //     dd(\Config\Services::validation());
+
+    //     return redirect()->to(base_url('comics'));
+    // }
     
 }
 

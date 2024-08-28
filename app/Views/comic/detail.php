@@ -15,8 +15,16 @@
                             <h5 class="card-title"><?= $comic['judul']; ?></h5>
                             <p class="card-text">Penulis : <?= $comic['penulis']; ?></p>
                             <p class="card-text"><small class="text-body-secondary">Penerbit : <?= $comic['penerbit']; ?></small></p>
-                            <a href="" class="btn btn-warning">Edit</a>
-                            <a href="" class="btn btn-danger">Delete</a>
+
+                            <a href="/comics/edit/<?= $comic['slug']; ?>" class="btn btn-warning">Edit</a>
+                            
+                            <form action="/comics/<?= $comic['id']; ?>" method="post" class="d-inline">
+                                <?= csrf_field(); ?>
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                            <!-- <a href="/comics/delete/<?= $comic['id']; ?>" class="btn btn-danger">Delete</a> -->
+
                             <br><br>
                             <a href="/comics">Back to comics list</a>
                         </div>
