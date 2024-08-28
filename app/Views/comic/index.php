@@ -8,7 +8,7 @@
                 <h1 class="mt-2">Daftar Komik</h1>
                 <?php if( session()->getFlashdata('pesan') ) : ?>
                     <div class="alert alert-success" role="alert">
-                        <?= $session()->getFlashdata('pesan'); ?>
+                        <?= session()->getFlashdata('pesan'); ?>
                     </div>
                 <?php endif; ?>
                 <table class="table">

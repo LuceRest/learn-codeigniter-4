@@ -16,7 +16,7 @@ class Comics extends BaseController
     public function index()
     {
         // $comics = $this->comicModel->findAll();
-
+        // session();
         $data = [
             'title' => 'Daftar Komik',
             'comics' => $this->comicModel->getComic()
@@ -44,9 +44,18 @@ class Comics extends BaseController
     }
     
     public function create() {
+        // session();
         $data = [
-            'title' => 'Form Add New Comic'
+            'title' => 'Form Add New Comic',
+            // 'validation' => \Config\Services::validation()
+            'validation' => false
         ];
+        // dd($data);   
+        // dd(\Config\Services::validation());
+
+        if ( session('validation') ) {
+            $data['validation'] = session('validation')->getErrors();
+        }
 
         return view('comic/create', $data);
     }
@@ -55,6 +64,24 @@ class Comics extends BaseController
         // Mengambil request form dengan method get maupun post
         // dd($this->request->getVar());
 
+        // Validasi input
+        if ( !$this->validate([
+            // 'judul' => 'required|is_unique[comic.judul]',
+            'judul' => [
+                'rules' => 'required|is_unique[comic.judul]',
+                'errors' => [
+                    'required' => '{field} komik harus diisi.',
+                    'is_unique' => '{field} komik sudah terdaftar.'
+                ]
+            ],
+            'penulis' => 'required',
+            'penerbit' => 'required',
+            'sampul' => 'required',
+        ]) ) {
+            $validation = \Config\Services::validation();
+            return redirect()->to(base_url('comics/create'))->withInput()->with('validation', $validation);
+        }
+        
         $slug = url_title($this->request->getVar('judul'), '-', true);
         
         // Melakukan save data
@@ -69,9 +96,17 @@ class Comics extends BaseController
         // Menambahkan flash message melalui session
         session()->setFlashdata('pesan', 'New Comic successfully added');
         
+        // dd($slug);
+        
         // Melakukan redirect url
         // return redirect()->to('/comics');
-        return redirect()->to(base_url() . '/comics');
+        return redirect()->to(base_url('comics'));
+    }
+    
+    public function change() {
+        dd(\Config\Services::validation());
+
+        return redirect()->to(base_url('comics'));
     }
     
 }
