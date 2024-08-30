@@ -79,11 +79,39 @@ class Comics extends BaseController
             ],
             'penulis' => 'required',
             'penerbit' => 'required',
-            'sampul' => 'required',
+            'sampul' => [
+                'rules' => 'max_size[sampul,5120]|is_image[sampul]|mime_in[sampul,image/jpg,image/jpeg,image/png]',
+                // 'rules' => 'uploaded[sampul]|max_size[sampul,5120]|is_image[sampul]|mime_in[sampul,image/jpg,image/jpeg,image/png]',
+                'errors' => [
+                    // 'uploaded' => 'Pilih gambar cover terlebih dahulu.',
+                    'max_size' => 'Ukuran gambar terlalu besar.',
+                    'is_image' => 'Yang anda pilih bukan gambar',
+                    'mime_in' => 'Yang anda pilih bukan gambar'
+                ]
+            ]
         ]) ) {
             $validation = \Config\Services::validation();
             return redirect()->to(base_url('comics/create'))->withInput()->with('validation', $validation);
+            // return redirect()->to(base_url('comics/create'))->withInput();
         }
+
+        // Ambil gambar
+        $fileSampul = $this->request->getFile('sampul');
+
+        // Apabila tidak ada gambar yang diupload
+        if ( $fileSampul->getError() == 4 ) {
+            $namaSampul = 'default.jpg';
+        } else {
+            // Generate nama sampul random
+            $namaSampul = $fileSampul->getRandomName();
+            
+            // Pindahkan file ke folder img
+            $fileSampul->move('img', $namaSampul);
+        }
+        
+
+        // Ambil nama file sampul
+        // $namaSampul = $fileSampul->getName();
         
         $slug = url_title($this->request->getVar('judul'), '-', true);
         
@@ -93,7 +121,7 @@ class Comics extends BaseController
             'slug' => $slug,
             'penulis' => $this->request->getVar('penulis'),
             'penerbit' => $this->request->getVar('penerbit'),
-            'sampul' => $this->request->getVar('sampul'),
+            'sampul' => $namaSampul
         ]);
 
         // Menambahkan flash message melalui session
@@ -108,6 +136,15 @@ class Comics extends BaseController
 
     // Method untuk melakukan delete data
     public function delete($id) {
+        // Cari gambar berdasarkan id
+        $comic = $this->comicModel->find($id);
+
+        // Cek jika file gambarnya default.jpg
+        if ( $comic['sampul'] != 'default.jpg' ) {
+            // Menghapus gambar
+            unlink('img/' . $comic['sampul']);
+        }
+        
         // Menghapus data
         $this->comicModel->delete($id);
 
@@ -158,11 +195,40 @@ class Comics extends BaseController
             ],
             'penulis' => 'required',
             'penerbit' => 'required',
-            'sampul' => 'required',
+            'sampul' => [
+                'rules' => 'max_size[sampul,5120]|is_image[sampul]|mime_in[sampul,image/jpg,image/jpeg,image/png]',
+                // 'rules' => 'uploaded[sampul]|max_size[sampul,5120]|is_image[sampul]|mime_in[sampul,image/jpg,image/jpeg,image/png]',
+                'errors' => [
+                    // 'uploaded' => 'Pilih gambar cover terlebih dahulu.',
+                    'max_size' => 'Ukuran gambar terlalu besar.',
+                    'is_image' => 'Yang anda pilih bukan gambar',
+                    'mime_in' => 'Yang anda pilih bukan gambar'
+                ]
+            ]        
         ]) ) {
             $validation = \Config\Services::validation();
             return redirect()->to(base_url('comics/edit/' . $this->request->getVar('slug') ))->withInput()->with('validation', $validation);
         }
+        
+        $fileSampul = $this->request->getFile('sampul');
+
+        // Cek gambar, apakah tetap gambar lama
+        if ( $fileSampul->getError() == 4 ) {
+            $namaSampul = $this->request->getVar('sampulLama');
+        } else {
+            // Generate nama sampul random
+            $namaSampul = $fileSampul->getRandomName();
+            
+            // Pindahkan file ke folder img
+            $fileSampul->move('img', $namaSampul);
+
+            // Cek gambar lama, apakah pakai default atau tidak
+            if ($this->request->getVar('sampulLama') != 'default.jpg') {
+                // Hapus file lama
+                unlink('img/' . $this->request->getVar('sampulLama'));
+            }
+        }
+
         
         $slug = url_title($this->request->getVar('judul'), '-', true);
         
@@ -173,7 +239,7 @@ class Comics extends BaseController
             'slug' => $slug,
             'penulis' => $this->request->getVar('penulis'),
             'penerbit' => $this->request->getVar('penerbit'),
-            'sampul' => $this->request->getVar('sampul'),
+            'sampul' => $namaSampul
         ]);
 
         // Menambahkan flash message melalui session
