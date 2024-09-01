@@ -33,3 +33,5 @@ $routes->post('/comics/update/(:segment)', 'Comics::update/$1');
 
 $routes->get('/comics/(:segment)', 'Comics::detail/$1');
 
+
+$routes->get('/orang', 'Orang::index');
