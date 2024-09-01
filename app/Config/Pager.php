@@ -26,7 +26,7 @@ class Pager extends BaseConfig
         'default_head'   => 'CodeIgniter\Pager\Views\default_head',
         
         // Custom pagination
-        'orang_pagination' => 'App\Views\Pagers\orang_pagination'
+        'orang_pagination' => 'App\Views\pagers\orang_pagination'
     ];
 
     /**
